@@ -1,0 +1,656 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Ocean View Resort • Dashboard</title>
+
+  <!-- Bootstrap 5.3 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+
+  <link rel="stylesheet" href="./assets/styles.css"/>
+</head>
+<body>
+
+<div class="ov-shell">
+
+  <!-- Sidebar -->
+  <aside class="ov-sidebar">
+    <div class="ov-brand">
+      <div class="ov-logo">OV</div>
+      <div>
+        <div class="title">Ocean View Resort</div>
+        <div class="subtitle">Reservation System</div>
+      </div>
+    </div>
+
+    <div class="ov-nav">
+      <button class="btn btn-outline-light active" data-section="dashboard">
+        <i class="bi bi-speedometer2"></i>Dashboard
+      </button>
+      <button class="btn btn-outline-light" data-section="newReservation">
+        <i class="bi bi-plus-circle"></i>New Reservation
+      </button>
+      <button class="btn btn-outline-light" data-section="manage">
+        <i class="bi bi-search"></i>Find / Manage
+      </button>
+      <button class="btn btn-outline-light" data-section="payments">
+        <i class="bi bi-cash-coin"></i>Payments
+      </button>
+      <button class="btn btn-outline-light" data-section="rooms">
+        <i class="bi bi-house-door"></i>Rooms & Rates
+      </button>
+      <button class="btn btn-outline-light d-none" id="navAudit" data-section="audit">
+        <i class="bi bi-shield-check"></i>Audit Log
+      </button>
+      <button class="btn btn-outline-light" data-section="help">
+        <i class="bi bi-life-preserver"></i>Help
+      </button>
+
+      <div class="mt-2 d-flex gap-2">
+        <button class="btn btn-outline-light flex-fill" id="btnSettings" type="button">
+          <i class="bi bi-gear me-1"></i>Settings
+        </button>
+        <button class="btn btn-outline-danger flex-fill" id="btnLogout" type="button">
+          <i class="bi bi-box-arrow-right me-1"></i>Logout
+        </button>
+      </div>
+    </div>
+
+    <div class="mt-3 ov-small">
+      API Base: <span id="apiBaseText"></span>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <main class="ov-main">
+    <div class="ov-topbar">
+      <div class="left">
+        <div class="ov-chip">
+          <i class="bi bi-person-circle"></i>
+          <span id="userText"></span>
+        </div>
+        <div class="ov-chip">
+          <i class="bi bi-key"></i>
+          <span id="roleText"></span>
+        </div>
+      </div>
+
+      <div class="d-flex gap-2">
+        <div class="ov-chip">
+          <i class="bi bi-clock"></i>
+          <span id="clockText"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dashboard -->
+    <section class="ov-section active" id="section-dashboard">
+      <div class="row g-3">
+        <div class="col-12 col-lg-7">
+          <div class="card ov-card">
+            <div class="card-header">
+              <div class="d-flex align-items-center justify-content-between">
+                <div>
+                  <div class="fw-bold">Quick Search</div>
+                  <div class="ov-small">Enter Reservation No (e.g., RSV-AB12CD34)</div>
+                </div>
+                <span class="badge badge-sky">Fast</span>
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="row g-2 align-items-end">
+                <div class="col-12 col-md-7">
+                  <label class="form-label">Reservation No</label>
+                  <input class="form-control" id="dashResNo" placeholder="RSV-XXXXXXXX"/>
+                </div>
+                <div class="col-12 col-md-5 d-grid">
+                  <button class="btn btn-primary" id="btnDashFind">
+                    <i class="bi bi-search me-2"></i>Find Reservation
+                  </button>
+                </div>
+              </div>
+
+              <div class="mt-3 d-none" id="dashResultWrap"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-12 col-lg-5">
+          <div class="card ov-card">
+            <div class="card-header">
+              <div class="d-flex align-items-center justify-content-between">
+                <div>
+                  <div class="fw-bold">Recent Reservations</div>
+                  <div class="ov-small">Saved on this browser</div>
+                </div>
+                <button class="btn btn-sm btn-outline-light" id="btnRefreshRecent">
+                  <i class="bi bi-arrow-clockwise"></i>
+                </button>
+              </div>
+            </div>
+            <div class="card-body">
+              <div id="recentList" class="d-grid gap-2"></div>
+              <div class="ov-small mt-2">Create a reservation to see it here.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-12">
+          <div class="card ov-card">
+            <div class="card-header">
+              <div class="fw-bold">Check Availability</div>
+              <div class="ov-small">Pick dates + room type to list available rooms.</div>
+            </div>
+            <div class="card-body">
+              <div class="row g-2 align-items-end">
+                <div class="col-12 col-md-4">
+                  <label class="form-label">Room Type</label>
+                  <select class="form-select" id="dashRoomType"></select>
+                </div>
+                <div class="col-6 col-md-3">
+                  <label class="form-label">From</label>
+                  <input type="date" class="form-control" id="dashFrom"/>
+                </div>
+                <div class="col-6 col-md-3">
+                  <label class="form-label">To</label>
+                  <input type="date" class="form-control" id="dashTo"/>
+                </div>
+                <div class="col-12 col-md-2 d-grid">
+                  <button class="btn btn-outline-light" id="btnDashAvail">
+                    <i class="bi bi-calendar2-check me-2"></i>Check
+                  </button>
+                </div>
+              </div>
+
+              <div class="mt-3 d-none" id="dashAvailWrap">
+                <div class="table-responsive">
+                  <table class="table table-hover align-middle mb-0">
+                    <thead>
+                      <tr>
+                        <th>Room</th>
+                        <th>Type</th>
+                        <th>Floor</th>
+                      </tr>
+                    </thead>
+                    <tbody id="dashAvailTbody"></tbody>
+                  </table>
+                </div>
+              </div>
+
+              <div class="ov-small mt-2">Tip: You can also create a booking in the “New Reservation” tab.</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- New Reservation -->
+    <section class="ov-section" id="section-newReservation">
+      <div class="card ov-card">
+        <div class="card-header">
+          <div class="d-flex align-items-center justify-content-between">
+            <div>
+              <div class="fw-bold">Create New Reservation</div>
+              <div class="ov-small">Fill guest details, select dates and room type, then confirm.</div>
+            </div>
+            <span class="badge badge-soft">RSV-XXXXXXXX</span>
+          </div>
+        </div>
+
+        <div class="card-body">
+          <form id="createForm" novalidate>
+            <div class="row g-3">
+              <div class="col-12 col-lg-5">
+                <div class="ov-kpi">
+                  <div class="label">Guest Details</div>
+
+                  <div class="mt-3">
+                    <label class="form-label">Full Name</label>
+                    <input class="form-control" id="cGuestName" placeholder="Guest name" required/>
+                  </div>
+                  <div class="mt-2">
+                    <label class="form-label">Address</label>
+                    <input class="form-control" id="cGuestAddress" placeholder="Guest address" required/>
+                  </div>
+                  <div class="mt-2">
+                    <label class="form-label">Contact Number</label>
+                    <input class="form-control" id="cGuestContact" placeholder="07XXXXXXXX" required/>
+                    <div class="ov-small mt-1">If this contact already exists, the system reuses the guest record.</div>
+                  </div>
+                  <div class="mt-2">
+                    <label class="form-label">Email (optional)</label>
+                    <input class="form-control" id="cGuestEmail" placeholder="email@example.com"/>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-12 col-lg-7">
+                <div class="ov-kpi">
+                  <div class="label">Reservation Details</div>
+
+                  <div class="row g-2 mt-2">
+                    <div class="col-12 col-md-6">
+                      <label class="form-label">Room Type</label>
+                      <select class="form-select" id="cRoomType" required></select>
+                    </div>
+                    <div class="col-6 col-md-3">
+                      <label class="form-label">Check-in</label>
+                      <input type="date" class="form-control" id="cCheckIn" required/>
+                    </div>
+                    <div class="col-6 col-md-3">
+                      <label class="form-label">Check-out</label>
+                      <input type="date" class="form-control" id="cCheckOut" required/>
+                    </div>
+                  </div>
+
+                  <div class="mt-2 d-flex gap-2">
+                    <button class="btn btn-outline-light" id="btnCheckAvail" type="button">
+                      <i class="bi bi-search me-2"></i>Find Available Rooms
+                    </button>
+                    <div class="ov-chip">
+                      <i class="bi bi-info-circle"></i>
+                      <span class="ov-small">If you don’t select a room, the system will auto-pick the first available.</span>
+                    </div>
+                  </div>
+
+                  <div class="mt-3 d-none" id="availWrap">
+                    <div class="table-responsive">
+                      <table class="table table-hover align-middle mb-0">
+                        <thead>
+                          <tr>
+                            <th style="width:54px;">Pick</th>
+                            <th>Room</th>
+                            <th>Type</th>
+                            <th>Floor</th>
+                          </tr>
+                        </thead>
+                        <tbody id="availTbody"></tbody>
+                      </table>
+                    </div>
+                  </div>
+
+                  <div class="mt-3">
+                    <label class="form-label">Notes (optional)</label>
+                    <input class="form-control" id="cNotes" placeholder="Any special request..."/>
+                  </div>
+
+                  <hr class="border border-light border-opacity-10">
+
+                  <div class="d-flex align-items-center justify-content-between">
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" id="cPayNow">
+                      <label class="form-check-label" for="cPayNow">
+                        Take advance payment now
+                      </label>
+                    </div>
+                    <span class="ov-small">Advance payments are recorded as transactions.</span>
+                  </div>
+
+                  <div class="row g-2 mt-2 d-none" id="payWrap">
+                    <div class="col-12 col-md-4">
+                      <label class="form-label">Method</label>
+                      <select class="form-select" id="cPayMethod">
+                        <option value="CASH">Cash</option>
+                        <option value="CARD">Card</option>
+                        <option value="ONLINE">Online</option>
+                      </select>
+                    </div>
+                    <div class="col-12 col-md-4">
+                      <label class="form-label">Amount</label>
+                      <input class="form-control" id="cPayAmount" type="number" min="0" step="0.01" placeholder="0.00"/>
+                    </div>
+                    <div class="col-12 col-md-4">
+                      <label class="form-label">Reference (optional)</label>
+                      <input class="form-control" id="cPayRef" placeholder="Card slip / txn id"/>
+                    </div>
+                    <div class="col-12">
+                      <label class="form-label">Payment Note (optional)</label>
+                      <input class="form-control" id="cPayNote" placeholder="Advance payment note"/>
+                    </div>
+                  </div>
+
+                  <div class="mt-3 d-grid">
+                    <button class="btn btn-primary" id="btnCreate" type="submit">
+                      <i class="bi bi-check2-circle me-2"></i>Create Reservation
+                    </button>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+          </form>
+
+          <div class="mt-3 d-none" id="createResult"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Find / Manage -->
+    <section class="ov-section" id="section-manage">
+      <div class="row g-3">
+        <div class="col-12 col-lg-5">
+          <div class="card ov-card">
+            <div class="card-header">
+              <div class="fw-bold">Find Reservation</div>
+              <div class="ov-small">Search by reservation number</div>
+            </div>
+            <div class="card-body">
+              <div class="row g-2 align-items-end">
+                <div class="col-12">
+                  <label class="form-label">Reservation No</label>
+                  <input class="form-control" id="mResNo" placeholder="RSV-XXXXXXXX"/>
+                </div>
+                <div class="col-12 d-grid">
+                  <button class="btn btn-primary" id="btnManageFind">
+                    <i class="bi bi-search me-2"></i>Search
+                  </button>
+                </div>
+              </div>
+
+              <hr class="border border-light border-opacity-10">
+
+              <div class="fw-bold mb-2">Update Dates / Room</div>
+              <div class="ov-small mb-2">Leave a field empty to keep current value.</div>
+
+              <div class="row g-2">
+                <div class="col-6">
+                  <label class="form-label">New Check-in</label>
+                  <input type="date" class="form-control" id="mNewIn"/>
+                </div>
+                <div class="col-6">
+                  <label class="form-label">New Check-out</label>
+                  <input type="date" class="form-control" id="mNewOut"/>
+                </div>
+                <div class="col-12">
+                  <label class="form-label">Change Room Type (optional)</label>
+                  <select class="form-select" id="mRoomType">
+                    <option value="">(keep current)</option>
+                  </select>
+                  <div class="ov-small mt-1">If you choose a type, system will pick an available room of that type.</div>
+                </div>
+                <div class="col-12">
+                  <label class="form-label">Notes (optional)</label>
+                  <input class="form-control" id="mNotes" placeholder="Update notes..."/>
+                </div>
+                <div class="col-12 d-grid">
+                  <button class="btn btn-outline-light" id="btnUpdate">
+                    <i class="bi bi-pencil-square me-2"></i>Update Reservation
+                  </button>
+                </div>
+              </div>
+
+              <hr class="border border-light border-opacity-10">
+
+              <div class="d-grid gap-2">
+                <button class="btn btn-outline-warning" id="btnCheckIn">
+                  <i class="bi bi-box-arrow-in-down me-2"></i>Check-in
+                </button>
+                <button class="btn btn-outline-success" id="btnCheckOut">
+                  <i class="bi bi-box-arrow-up me-2"></i>Check-out
+                </button>
+                <button class="btn btn-outline-danger" id="btnCancel">
+                  <i class="bi bi-x-octagon me-2"></i>Cancel Reservation
+                </button>
+              </div>
+
+              <div class="ov-small mt-2">
+                Checkout requires invoice to be <strong>PAID</strong>.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-12 col-lg-7">
+          <div class="card ov-card">
+            <div class="card-header">
+              <div class="d-flex align-items-center justify-content-between">
+                <div>
+                  <div class="fw-bold">Reservation Details</div>
+                  <div class="ov-small">Invoice & status summary</div>
+                </div>
+                <span class="badge badge-soft" id="mStatusBadge">No data</span>
+              </div>
+            </div>
+            <div class="card-body">
+              <div id="mDetails" class="ov-muted">Search a reservation to view details.</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Payments -->
+    <section class="ov-section" id="section-payments">
+      <div class="row g-3">
+        <div class="col-12 col-lg-5">
+          <div class="card ov-card">
+            <div class="card-header">
+              <div class="fw-bold">Payment Actions</div>
+              <div class="ov-small">Add advance/partial/balance payment</div>
+            </div>
+            <div class="card-body">
+              <div class="mb-3">
+                <label class="form-label">Reservation No</label>
+                <input class="form-control" id="pResNo" placeholder="RSV-XXXXXXXX"/>
+              </div>
+
+              <button class="btn btn-outline-light w-100 mb-3" id="btnLoadPayments">
+                <i class="bi bi-arrow-repeat me-2"></i>Load Invoice & Payments
+              </button>
+
+              <div class="ov-kpi mb-3">
+                <div class="label">Invoice Summary</div>
+                <div id="pInvoiceText" class="ov-muted mt-2">Load a reservation to see invoice.</div>
+              </div>
+
+              <div class="fw-bold mb-2">Add Payment</div>
+              <div class="row g-2">
+                <div class="col-12 col-md-6">
+                  <label class="form-label">Type</label>
+                  <select class="form-select" id="pType">
+                    <option value="ADVANCE">Advance</option>
+                    <option value="BALANCE">Balance</option>
+                    <option value="REFUND">Refund</option>
+                  </select>
+                </div>
+                <div class="col-12 col-md-6">
+                  <label class="form-label">Method</label>
+                  <select class="form-select" id="pMethod">
+                    <option value="CASH">Cash</option>
+                    <option value="CARD">Card</option>
+                    <option value="ONLINE">Online</option>
+                  </select>
+                </div>
+                <div class="col-12">
+                  <label class="form-label">Amount</label>
+                  <input class="form-control" id="pAmount" type="number" min="0" step="0.01" placeholder="0.00"/>
+                </div>
+                <div class="col-12">
+                  <label class="form-label">Reference (optional)</label>
+                  <input class="form-control" id="pRef" placeholder="Card slip / txn id"/>
+                </div>
+                <div class="col-12">
+                  <label class="form-label">Note (optional)</label>
+                  <input class="form-control" id="pNote" placeholder="Payment note"/>
+                </div>
+                <div class="col-12 d-grid">
+                  <button class="btn btn-primary" id="btnAddPayment">
+                    <i class="bi bi-plus-circle me-2"></i>Add Payment
+                  </button>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        <div class="col-12 col-lg-7">
+          <div class="card ov-card">
+            <div class="card-header">
+              <div class="d-flex align-items-center justify-content-between">
+                <div>
+                  <div class="fw-bold">Payment History</div>
+                  <div class="ov-small">Transactions for the selected reservation</div>
+                </div>
+                <span class="badge badge-soft" id="pCountBadge">0</span>
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                  <thead>
+                    <tr>
+                      <th>#</th>
+                      <th>Type</th>
+                      <th>Method</th>
+                      <th class="text-end">Amount</th>
+                      <th>Status</th>
+                      <th>Paid At</th>
+                    </tr>
+                  </thead>
+                  <tbody id="pTbody">
+                    <tr><td colspan="6" class="ov-muted">Load a reservation to view payments.</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Rooms & Rates -->
+    <section class="ov-section" id="section-rooms">
+      <div class="card ov-card">
+        <div class="card-header">
+          <div class="d-flex align-items-center justify-content-between">
+            <div>
+              <div class="fw-bold">Room Types & Rates</div>
+              <div class="ov-small">Rates are used for billing (nights × rate).</div>
+            </div>
+            <span class="badge badge-soft">Read-only</span>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+              <thead>
+                <tr>
+                  <th>Type</th>
+                  <th>Description</th>
+                  <th class="text-end">Rate / Night</th>
+                </tr>
+              </thead>
+              <tbody id="rtTbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Audit -->
+    <section class="ov-section" id="section-audit">
+      <div class="card ov-card">
+        <div class="card-header">
+          <div class="d-flex align-items-center justify-content-between">
+            <div>
+              <div class="fw-bold">User Activity Audit Log</div>
+              <div class="ov-small">Admin-only. Filter by action/entity/user.</div>
+            </div>
+            <span class="badge badge-soft">ADMIN</span>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="row g-2 align-items-end">
+            <div class="col-12 col-md-4">
+              <label class="form-label">Action</label>
+              <input class="form-control" id="aAction" placeholder="e.g., RESERVATION_CREATE"/>
+            </div>
+            <div class="col-12 col-md-4">
+              <label class="form-label">Entity Type</label>
+              <input class="form-control" id="aEntity" placeholder="Reservation / Payment / User"/>
+            </div>
+            <div class="col-12 col-md-2">
+              <label class="form-label">User ID</label>
+              <input class="form-control" id="aUserId" placeholder="1"/>
+            </div>
+            <div class="col-12 col-md-2 d-grid">
+              <button class="btn btn-outline-light" id="btnLoadAudit">
+                <i class="bi bi-funnel me-2"></i>Load
+              </button>
+            </div>
+          </div>
+
+          <div class="mt-3 table-responsive">
+            <table class="table table-hover align-middle mb-0">
+              <thead>
+                <tr>
+                  <th>Time</th>
+                  <th>User</th>
+                  <th>Action</th>
+                  <th>Entity</th>
+                  <th>Description</th>
+                  <th>IP</th>
+                </tr>
+              </thead>
+              <tbody id="aTbody">
+                <tr><td colspan="6" class="ov-muted">Click Load to view audit logs.</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- Help -->
+    <section class="ov-section" id="section-help">
+      <div class="card ov-card">
+        <div class="card-header">
+          <div class="fw-bold">Help • Guidelines for New Staff</div>
+          <div class="ov-small">Quick instructions to use the reservation system.</div>
+        </div>
+        <div class="card-body" id="helpBody"></div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<!-- Settings Modal -->
+<div class="modal fade" id="settingsModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content ov-card">
+      <div class="modal-header">
+        <h5 class="modal-title">Settings</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <label class="form-label">API Base URL</label>
+        <input class="form-control" id="apiBaseInput" placeholder="http://localhost:8080/oceanview-backend/api"/>
+        <div class="ov-small mt-2">
+          Example: <code>http://localhost:8080/oceanview-backend/api</code>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline-light" data-bs-dismiss="modal">Close</button>
+        <button class="btn btn-primary" id="btnSaveApi">Save</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast-container position-fixed bottom-0 end-0 p-3"></div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- App -->
+<script type="module" src="./js/app.js"></script>
+</body>
+</html>

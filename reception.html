@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Reception Dashboard</title>
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+  <div class="appShell">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebarTop">
+        <div class="brandLogo small">OV</div>
+        <div>
+          <h2>Ocean View</h2>
+          <p class="muted smallText">Reception Panel</p>
+        </div>
+      </div>
+
+      <nav class="navMenu">
+        <button class="navItem active" onclick="showReceptionTab('create', this)">Create Reservation</button>
+        <button class="navItem" onclick="showReceptionTab('search', this)">Search / Status</button>
+        <button class="navItem" onclick="showReceptionTab('bill', this)">Bill & Print</button>
+      </nav>
+
+      <div class="sidebarBottom">
+        <div id="who" class="userBadge"></div>
+        <button class="dangerBtn fullBtn" onclick="logout()">Logout</button>
+      </div>
+    </aside>
+
+    <main class="mainContent">
+      <div class="mobileTopbar">
+        <button class="ghostBtn" onclick="toggleSidebar()">☰ Menu</button>
+        <h1>Reception Dashboard</h1>
+      </div>
+
+      <section id="reception-create" class="tabSection active">
+        <div class="pageHeader">
+          <div>
+            <h1>Create Reservation</h1>
+            <p class="muted">Add new guest bookings easily.</p>
+          </div>
+          <button class="secondaryBtn" onclick="loadRoomTypes()">Reload Room Types</button>
+        </div>
+
+        <div class="card">
+          <div class="formGrid">
+            <div class="formGroup">
+              <label for="name">Guest Name</label>
+              <input id="name" placeholder="Guest Name">
+            </div>
+            <div class="formGroup">
+              <label for="addr">Address</label>
+              <input id="addr" placeholder="Address">
+            </div>
+            <div class="formGroup">
+              <label for="phone">Phone</label>
+              <input id="phone" placeholder="Phone">
+            </div>
+            <div class="formGroup">
+              <label for="roomTypeId">Room Type</label>
+              <select id="roomTypeId"></select>
+            </div>
+            <div class="formGroup">
+              <label for="cin">Check In</label>
+              <input id="cin" type="date">
+            </div>
+            <div class="formGroup">
+              <label for="cout">Check Out</label>
+              <input id="cout" type="date">
+            </div>
+          </div>
+
+          <div class="buttonRow">
+            <button class="secondaryBtn" onclick="checkAvailabilityReception()">Check Availability</button>
+            <button class="primaryBtn" onclick="createReservation()">Save Reservation</button>
+            <button class="secondaryBtn" onclick="clearReceptionForm()">Clear</button>
+          </div>
+
+          <p id="receptionCreateMessage" class="successText"></p>
+        </div>
+
+        <div class="card">
+          <h3>Availability Result</h3>
+          <div class="infoGrid">
+            <div><strong>Room Type:</strong> <span id="receptionAvailRoomType">—</span></div>
+            <div><strong>Total Rooms:</strong> <span id="receptionAvailTotal">—</span></div>
+            <div><strong>Reserved Rooms:</strong> <span id="receptionAvailReserved">—</span></div>
+            <div><strong>Available Rooms:</strong> <span id="receptionAvailAvailable">—</span></div>
+            <div><strong>Check In:</strong> <span id="receptionAvailCheckIn">—</span></div>
+            <div><strong>Check Out:</strong> <span id="receptionAvailCheckOut">—</span></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="reception-search" class="tabSection">
+        <div class="pageHeader">
+          <div>
+            <h1>Search & Reservation Status</h1>
+            <p class="muted">View reservations, update, cancel and track current status.</p>
+          </div>
+          <button class="secondaryBtn" onclick="loadRecentReservations()">Refresh Recent</button>
+        </div>
+
+        <div class="card">
+          <div class="formInline">
+            <input id="resNo" placeholder="Reservation No">
+            <button class="primaryBtn" onclick="searchReservation()">Search</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Recent Reservations</h3>
+          <div class="tableWrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Reservation No</th>
+                  <th>Guest</th>
+                  <th>Room</th>
+                  <th>Check In</th>
+                  <th>Check Out</th>
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="recentTbody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Selected Reservation</h3>
+          <div class="infoGrid">
+            <div><strong>Reservation No:</strong> <span id="cResNo">—</span></div>
+            <div><strong>Guest Name:</strong> <span id="cGuest">—</span></div>
+            <div><strong>Contact:</strong> <span id="cContact">—</span></div>
+            <div><strong>Address:</strong> <span id="cAddress">—</span></div>
+            <div><strong>Room Type:</strong> <span id="cRoom">—</span></div>
+            <div><strong>Check In:</strong> <span id="cIn">—</span></div>
+            <div><strong>Check Out:</strong> <span id="cOut">—</span></div>
+            <div><strong>Status:</strong> <span id="cStatus">—</span></div>
+          </div>
+
+          <div class="buttonRow">
+            <button class="secondaryBtn" onclick="fillEditFromSelected()">Load to Edit Form</button>
+            <button class="warnBtn" onclick="updateSelectedReservation()">Update Reservation</button>
+            <button class="dangerBtn" onclick="cancelSelectedReservation()">Cancel Reservation</button>
+          </div>
+
+          <p id="receptionReservationMessage" class="successText"></p>
+        </div>
+
+        <div class="card">
+          <h3>Edit Reservation</h3>
+          <div class="formGrid">
+            <div class="formGroup">
+              <label for="editName">Guest Name</label>
+              <input id="editName" placeholder="Guest Name">
+            </div>
+            <div class="formGroup">
+              <label for="editAddr">Address</label>
+              <input id="editAddr" placeholder="Address">
+            </div>
+            <div class="formGroup">
+              <label for="editPhone">Phone</label>
+              <input id="editPhone" placeholder="Phone">
+            </div>
+            <div class="formGroup">
+              <label for="editRoomTypeId">Room Type</label>
+              <select id="editRoomTypeId"></select>
+            </div>
+            <div class="formGroup">
+              <label for="editCin">Check In</label>
+              <input id="editCin" type="date">
+            </div>
+            <div class="formGroup">
+              <label for="editCout">Check Out</label>
+              <input id="editCout" type="date">
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="reception-bill" class="tabSection">
+        <div class="pageHeader">
+          <div>
+            <h1>Bill & Print</h1>
+            <p class="muted">Generate and print reservation bills.</p>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="buttonRow">
+            <button class="secondaryBtn" onclick="generateBill()">Generate Bill</button>
+            <button class="primaryBtn" onclick="printBill()">Print Bill</button>
+          </div>
+
+          <div class="infoGrid billGrid">
+            <div><strong>Reservation No:</strong> <span id="bResNo">—</span></div>
+            <div><strong>Nights:</strong> <span id="bNights">—</span></div>
+            <div><strong>Rate per Night:</strong> <span id="bRate">—</span></div>
+            <div><strong>Total:</strong> <span id="bTotal">—</span></div>
+          </div>
+
+          <p id="billMessage" class="successText"></p>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="assets/app.js"></script>
+  <script>
+    requireRole('RECEPTIONIST');
+    initUserBadge();
+    loadRoomTypes();
+    loadEditRoomTypes();
+    loadRecentReservations();
+  </script>
+</body>
+</html>

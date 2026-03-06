@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Ocean View Resort - Login</title>
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body class="loginBody">
+  <div class="loginWrap">
+    <div class="loginCard">
+      <div class="brandBlock">
+        <div class="brandLogo">OV</div>
+        <div>
+          <h1>Ocean View Resort</h1>
+          <p class="muted">Reservation Management System</p>
+        </div>
+      </div>
+
+      <h2>Login</h2>
+
+      <div class="formGroup">
+        <label for="u">Username</label>
+        <input id="u" placeholder="Enter username">
+      </div>
+
+      <div class="formGroup">
+        <label for="p">Password</label>
+        <input id="p" type="password" placeholder="Enter password">
+      </div>
+
+      <button class="primaryBtn fullBtn" onclick="login()">Login</button>
+      <p id="msg" class="errorText"></p>
+    </div>
+  </div>
+
+  <script src="assets/app.js"></script>
+</body>
+</html>

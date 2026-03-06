@@ -1,0 +1,378 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Admin Dashboard</title>
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+  <div class="appShell">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebarTop">
+        <div class="brandLogo small">OV</div>
+        <div>
+          <h2>Ocean View</h2>
+          <p class="muted smallText">Admin Panel</p>
+        </div>
+      </div>
+
+      <nav class="navMenu">
+        <button class="navItem active" onclick="showAdminTab('dashboard', this)">Dashboard</button>
+        <button class="navItem" onclick="showAdminTab('roomTypes', this)">Room Types</button>
+        <button class="navItem" onclick="showAdminTab('users', this)">Users</button>
+        <button class="navItem" onclick="showAdminTab('reservations', this)">Reservations</button>
+        <button class="navItem" onclick="showAdminTab('income', this)">Monthly Income</button>
+      </nav>
+
+      <div class="sidebarBottom">
+        <div id="who" class="userBadge"></div>
+        <button class="dangerBtn fullBtn" onclick="logout()">Logout</button>
+      </div>
+    </aside>
+
+    <main class="mainContent">
+      <div class="mobileTopbar">
+        <button class="ghostBtn" onclick="toggleSidebar()">☰ Menu</button>
+        <h1>Admin Dashboard</h1>
+      </div>
+
+      <section id="tab-dashboard" class="tabSection active">
+        <div class="pageHeader">
+          <div>
+            <h1>Dashboard</h1>
+            <p class="muted">Manage hotel operations with easy access tabs.</p>
+          </div>
+        </div>
+
+        <div class="statsGrid">
+          <div class="statCard">
+            <h3>Room Types</h3>
+            <p id="roomTypeCount" class="statValue">0</p>
+          </div>
+          <div class="statCard">
+            <h3>Users</h3>
+            <p id="userCount" class="statValue">0</p>
+          </div>
+          <div class="statCard">
+            <h3>Reservations</h3>
+            <p id="reservationCount" class="statValue">0</p>
+          </div>
+          <div class="statCard">
+            <h3>Current Month Income</h3>
+            <p id="monthIncomeCard" class="statValue">Rs.0.00</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="tab-roomTypes" class="tabSection">
+        <div class="pageHeader">
+          <div>
+            <h1>Room Types</h1>
+            <p class="muted">Add, update and delete room categories.</p>
+          </div>
+          <button class="secondaryBtn" onclick="loadAllRoomTypes()">Refresh</button>
+        </div>
+
+        <div class="card">
+          <h3>Add Room Type</h3>
+          <div class="formGrid">
+            <div class="formGroup">
+              <label for="rtCode">Type Code</label>
+              <input id="rtCode" placeholder="DELUXE">
+            </div>
+            <div class="formGroup">
+              <label for="rtName">Room Type Name</label>
+              <input id="rtName" placeholder="Deluxe Room">
+            </div>
+            <div class="formGroup">
+              <label for="rtRate">Rate Per Night</label>
+              <input id="rtRate" type="number" placeholder="18000">
+            </div>
+            <div class="formGroup">
+              <label for="rtTotalRooms">Total Rooms</label>
+              <input id="rtTotalRooms" type="number" placeholder="5">
+            </div>
+            <div class="formGroup checkboxGroup">
+              <label><input id="rtActive" type="checkbox" checked> Active</label>
+            </div>
+          </div>
+          <button class="primaryBtn" onclick="createRoomType()">Add Room Type</button>
+          <p id="rtMessage" class="successText"></p>
+        </div>
+
+        <div class="card">
+          <h3>Room Type List</h3>
+          <div class="tableWrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Code</th>
+                  <th>Name</th>
+                  <th>Rate</th>
+                  <th>Total Rooms</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="roomTypesTbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section id="tab-users" class="tabSection">
+        <div class="pageHeader">
+          <div>
+            <h1>Users</h1>
+            <p class="muted">Create and manage system users.</p>
+          </div>
+          <button class="secondaryBtn" onclick="loadUsers()">Refresh</button>
+        </div>
+
+        <div class="card">
+          <h3>Add User</h3>
+          <div class="formGrid">
+            <div class="formGroup">
+              <label for="un">Username</label>
+              <input id="un" placeholder="username">
+            </div>
+            <div class="formGroup">
+              <label for="pw">Password</label>
+              <input id="pw" type="password" placeholder="password">
+            </div>
+            <div class="formGroup">
+              <label for="fn">Full Name</label>
+              <input id="fn" placeholder="Full name">
+            </div>
+            <div class="formGroup">
+              <label for="ph">Phone</label>
+              <input id="ph" placeholder="0771234567">
+            </div>
+            <div class="formGroup checkboxGroup">
+              <label><input id="uActive" type="checkbox" checked> Active</label>
+            </div>
+            <div class="formGroup checkboxGroup">
+              <label><input id="roleAdmin" type="checkbox"> Admin</label>
+              <label><input id="roleReception" type="checkbox" checked> Receptionist</label>
+            </div>
+          </div>
+          <button class="primaryBtn" onclick="createUser()">Add User</button>
+          <p id="userMessage" class="successText"></p>
+        </div>
+
+        <div class="card">
+          <h3>User List</h3>
+          <div class="tableWrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Username</th>
+                  <th>Full Name</th>
+                  <th>Phone</th>
+                  <th>Roles</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="usersTbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section id="tab-reservations" class="tabSection">
+        <div class="pageHeader">
+          <div>
+            <h1>Reservations</h1>
+            <p class="muted">View current reservation status, update, cancel and print bills.</p>
+          </div>
+          <button class="secondaryBtn" onclick="loadAllStatuses()">Refresh</button>
+        </div>
+
+        <div class="card">
+          <h3>Check Room Availability</h3>
+          <div class="formGrid">
+            <div class="formGroup">
+              <label for="adminAvailRoomTypeId">Room Type</label>
+              <select id="adminAvailRoomTypeId"></select>
+            </div>
+            <div class="formGroup">
+              <label for="adminAvailCheckIn">Check In</label>
+              <input id="adminAvailCheckIn" type="date">
+            </div>
+            <div class="formGroup">
+              <label for="adminAvailCheckOut">Check Out</label>
+              <input id="adminAvailCheckOut" type="date">
+            </div>
+          </div>
+
+          <div class="buttonRow">
+            <button class="secondaryBtn" onclick="checkAvailabilityAdmin()">Check Availability</button>
+          </div>
+
+          <div class="infoGrid" style="margin-top:16px;">
+            <div><strong>Room Type:</strong> <span id="adminAvailRoomType">—</span></div>
+            <div><strong>Total Rooms:</strong> <span id="adminAvailTotal">—</span></div>
+            <div><strong>Reserved Rooms:</strong> <span id="adminAvailReserved">—</span></div>
+            <div><strong>Available Rooms:</strong> <span id="adminAvailAvailable">—</span></div>
+            <div><strong>Check In:</strong> <span id="adminAvailCheckInText">—</span></div>
+            <div><strong>Check Out:</strong> <span id="adminAvailCheckOutText">—</span></div>
+          </div>
+
+          <p id="adminAvailabilityMessage" class="successText"></p>
+        </div>
+
+        <div class="card">
+          <h3>Reservation Status List</h3>
+          <div class="tableWrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Reservation No</th>
+                  <th>Guest</th>
+                  <th>Room</th>
+                  <th>Check In</th>
+                  <th>Check Out</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="adminReservationsTbody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Selected Reservation</h3>
+          <div class="infoGrid">
+            <div><strong>Reservation No:</strong> <span id="aResNo">—</span></div>
+            <div><strong>Guest Name:</strong> <span id="aGuestName">—</span></div>
+            <div><strong>Contact:</strong> <span id="aGuestContact">—</span></div>
+            <div><strong>Address:</strong> <span id="aGuestAddress">—</span></div>
+            <div><strong>Room Type:</strong> <span id="aRoomType">—</span></div>
+            <div><strong>Check In:</strong> <span id="aCheckIn">—</span></div>
+            <div><strong>Check Out:</strong> <span id="aCheckOut">—</span></div>
+            <div><strong>Status:</strong> <span id="aStatus">—</span></div>
+          </div>
+
+          <div class="buttonRow">
+            <button class="secondaryBtn" onclick="fillAdminEditForm()">Load to Edit Form</button>
+            <button class="warnBtn" onclick="adminUpdateReservation()">Update</button>
+            <button class="dangerBtn" onclick="adminCancelReservation()">Cancel</button>
+            <button class="secondaryBtn" onclick="adminGenerateBill()">Generate Bill</button>
+            <button class="primaryBtn" onclick="adminPrintBill()">Print Bill</button>
+          </div>
+          <p id="adminReservationMessage" class="successText"></p>
+        </div>
+
+        <div class="card">
+          <h3>Edit Reservation</h3>
+          <div class="formGrid">
+            <div class="formGroup">
+              <label for="adminGuestName">Guest Name</label>
+              <input id="adminGuestName" placeholder="Guest Name">
+            </div>
+            <div class="formGroup">
+              <label for="adminGuestAddress">Address</label>
+              <input id="adminGuestAddress" placeholder="Address">
+            </div>
+            <div class="formGroup">
+              <label for="adminGuestContact">Contact</label>
+              <input id="adminGuestContact" placeholder="Contact">
+            </div>
+            <div class="formGroup">
+              <label for="adminRoomTypeId">Room Type</label>
+              <select id="adminRoomTypeId"></select>
+            </div>
+            <div class="formGroup">
+              <label for="adminCheckIn">Check In</label>
+              <input id="adminCheckIn" type="date">
+            </div>
+            <div class="formGroup">
+              <label for="adminCheckOut">Check Out</label>
+              <input id="adminCheckOut" type="date">
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="tab-income" class="tabSection">
+        <div class="pageHeader">
+          <div>
+            <h1>Current Month Income</h1>
+            <p class="muted">See total reservation income for this month.</p>
+          </div>
+          <button class="secondaryBtn" onclick="loadCurrentMonthIncome()">Refresh</button>
+        </div>
+
+        <div class="statsGrid">
+          <div class="statCard">
+            <h3>Month Income</h3>
+            <p id="monthIncome" class="statValue">Rs.0.00</p>
+          </div>
+          <div class="statCard">
+            <h3>Paid Reservations</h3>
+            <p id="monthReservationCount" class="statValue">0</p>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Refund Payment</h3>
+          <div class="formGrid">
+            <div class="formGroup">
+              <label for="refundReservationId">Reservation ID</label>
+              <input id="refundReservationId" placeholder="Reservation ID">
+            </div>
+            <div class="formGroup">
+              <label for="refundPaymentId">Payment ID</label>
+              <input id="refundPaymentId" placeholder="Payment ID">
+            </div>
+            <div class="formGroup">
+              <label for="refundReason">Refund Reason</label>
+              <input id="refundReason" placeholder="Reason for refund">
+            </div>
+          </div>
+
+          <div class="buttonRow">
+            <button class="secondaryBtn" onclick="loadReservationPayments()">Load Payments</button>
+            <button class="dangerBtn" onclick="refundPayment()">Refund Payment</button>
+          </div>
+
+          <p id="refundMessage" class="successText"></p>
+
+          <div class="tableWrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Payment ID</th>
+                  <th>Reservation No</th>
+                  <th>Amount</th>
+                  <th>Status</th>
+                  <th>Payment Date</th>
+                  <th>Refund Reason</th>
+                </tr>
+              </thead>
+              <tbody id="paymentsTbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="assets/app.js"></script>
+  <script>
+    requireRole('ADMIN');
+    initUserBadge();
+    loadAllRoomTypes();
+    loadUsers();
+    loadAdminRoomTypesDropdown();
+    loadAdminAvailabilityRoomTypes();
+    loadAllStatuses();
+    loadCurrentMonthIncome();
+  </script>
+</body>
+</html>

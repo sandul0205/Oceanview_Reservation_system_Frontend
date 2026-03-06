@@ -1,39 +1,45 @@
-# Ocean View Resort — Modern Frontend (HTML + Bootstrap + Vanilla JS)
+# Ocean View Reservation System Frontend
 
-This frontend connects to your **Payara backend** (`oceanview-backend`) using REST APIs.
+This repository contains the frontend of the **Ocean View Reservation System**.  
+It is a simple web-based interface built for managing hotel reservations and supporting daily reception and admin tasks.
 
-## 1) Configure API Base URL
-Default:
-- `http://localhost:8080/oceanview-backend/api`
+## Project Overview
 
-You can change it:
-- On **Login page** (gear icon) OR
-- In **App Settings** (gear button in sidebar)
+The system is designed for a resort or hotel environment where staff can:
 
-The value is saved in your browser (localStorage).
+- log in securely
+- manage room reservations
+- check booking details
+- handle customer-related reservation tasks
+- access admin and reception functions through separate interfaces
 
-## 2) Run Frontend
-Use any static server (recommended):
-- VS Code → **Live Server**
-- or Python:
-  - `python -m http.server 5500`
+This frontend works together with the backend API of the Ocean View Reservation System.
 
-Then open:
-- `http://localhost:5500/index.html`
+## Main Features
 
-## 3) Login
-Use a user that exists in your MySQL `users` table (password must match bcrypt hash in DB).
+- User login page
+- Role-based access interface
+- Admin dashboard
+- Reception dashboard
+- Reservation form handling
+- Customer and booking management screens
+- Help section for new staff members
+- Clean and simple user interface
 
-## 4) Features included
-- Login (JWT)
-- Room types & rates (read-only)
-- Check room availability (by type + date range)
-- Create reservation (auto-pick room OR select available room)
-- Find/manage reservation (update dates/room type, cancel, check-in, check-out)
-- Advanced payments (advance/balance/refund) + payment history
-- Audit log (ADMIN only)
-- Help tab for new staff
+## Technologies Used
 
-## Notes
-- Backend already sets `Access-Control-Allow-Origin: *` so CORS works for local dev.
-- “Recent Reservations” list is saved only on the browser you use.
+- HTML5
+- CSS3
+- JavaScript
+- REST API integration
+
+## Project Structure
+
+```bash
+Oceanview_Reservation_system_Frontend/
+│
+├── assets/          # Images, styles, and static resources
+├── js/              # JavaScript files
+├── index.html       # Login page
+├── app.html         # Main application/dashboard page
+└── README.md
